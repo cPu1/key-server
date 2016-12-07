@@ -19,7 +19,7 @@ class KeyGen
     @timers = Timers::Group.new
     Thread.new {
       loop do
-        @timers.after(5) {} #
+        @timers.after(5) {} #TODO
         @timers.wait
       end
     }
