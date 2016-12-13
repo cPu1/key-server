@@ -72,10 +72,7 @@ class KeyGen
 
   def unblock(key)
     synchronize do
-      timer = @blocked_keys.delete(key)
-      raise KeyGenError, key if !timer
-      timer.cancel
-      @keys[key] = make_timer(key)
+      reset_key(key, @blocked_keys.delete(key))
     end
   end
 
@@ -89,18 +86,21 @@ class KeyGen
 
   def refresh_key(key)
     synchronize do
-      timer = @keys[key]
-      raise KeyGenError, key if !timer
-      timer.cancel
-      @keys[key] = make_timer(key)
+      reset_key(key, @keys[key])
     end
+  end
+
+  def reset_key(key, timer)
+    raise KeyGenError, key if !timer
+    timer.cancel
+    @keys[key] = make_timer(key)
   end
 
   def inspect()
     return "keys: #{@keys.keys}, blocked_keys: #{@blocked_keys.keys}"
   end
 
-  private :make_timer, :make_blocked_timer, :start_timer
+  private :make_timer, :make_blocked_timer, :start_timer, :reset_key
 end
 
 class KeyGenError < StandardError
